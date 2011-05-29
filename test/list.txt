@@ -1,3 +1,5 @@
 Aurangzeb,Mughal Empire,Aurangzeb.xml
 Autism,Neurodevelopmental disorder,Autism.xml
-Activism,Social change,Activism.xml
+Activism,social change,Activism.xml
+Acid,Base (chemistry),Acid.xml
+Art,senses,Art.xml
