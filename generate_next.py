@@ -150,7 +150,7 @@ def generate_next(fname, existing):
 					raise Exception, (newlink, redirects[newlink])
 
 				if newlink[0] == "#":
-					raise Exception, (newlink, earlierText)
+					continue
 
 				yield (current, newlink)
 				current = None
