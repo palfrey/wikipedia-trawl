@@ -3,3 +3,4 @@ Autism,Neurodevelopmental disorder,Autism.xml
 Activism,social change,Activism.xml
 Acid,Base (chemistry),Acid.xml
 Art,senses,Art.xml
+Afonso de Albuquerque,Portugal,AfonsodeAlbuquerque.xml
