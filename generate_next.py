@@ -46,6 +46,7 @@ for line in dump:
 				print "poss", poss.groups()
 				line = poss.groups()[0]
 				earlierText = ""
+				brackets = []
 			else:
 				continue
 		
@@ -93,36 +94,38 @@ for line in dump:
 				raise Exception, (newlink, earlierText[:l.end()])
 			#print "earlier", earlierText
 
-			brackets = []
 			for match in bracket.finditer(earlierText[:l.start()]):
 				bra = match.groups()[0]
 				if bra in ("{{", "("):
-					brackets.append(bra)
+					brackets.append((bra, match.start()))
 				elif bra in ("}}", ")"):
 					# cope with mismatched brackets
 					if bra == "}}":
-						while len(brackets)>0 and brackets[-1] != "{{":
+						while len(brackets)>0 and brackets[-1][0] != "{{":
 							brackets = brackets[:-1]
 						brackets = brackets[:-1]
 					elif bra == ")":
-						if len(brackets)>0 and brackets[-1] == "(":
+						if len(brackets)>0 and brackets[-1][0] == "(":
 							brackets = brackets[:-1]
 					else:
 						raise Exception, earlierText
 				elif bra == "''":
-					if len(brackets)>0 and brackets[-1] == "''":
+					if len(brackets)>0 and brackets[-1][0] == "''":
 						brackets = brackets[:-1]
 					else:
-						brackets.append(bra)
+						brackets.append((bra, match.start()))
 				elif bra == "\n":
-					if len(brackets)>0 and brackets[-1] == "''":
+					if len(brackets)>0 and brackets[-1][0] == "''":
 						brackets = brackets[:-1]
 				else:
 					raise Exception, (bra, earlierText[:l.start()])
 			
 			if len(brackets) > 0:
-				#print "bad count", len(brackets), newlink.encode("ascii", "replace")
-				continue
+				print "bad match", brackets, earlierText
+				earlierText = earlierText[l.end():]
+				break
+			
+			brackets = []
 
 			if newlink in redirects:
 				raise Exception, (newlink, redirects[newlink])
