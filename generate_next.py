@@ -9,8 +9,8 @@ sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
 
 title = re.compile("<title>([^>]+)</title")
 text = re.compile("<text xml:space=\"preserve\">(.+)")
-link = re.compile("\[\[([^\]]+)\]\]")
 bracket = re.compile("((?:{{)|(?:}})|\(|\)|(?:(?<!')''(?!'))|\n)")
+link = re.compile("((?:\[\[)|(?:\]\]))")
 
 debug = False
 
@@ -68,8 +68,24 @@ def generate_next(fname, existing):
 			if continueLoop:
 				continue
 
+			linkbegin = 0
+			linkcount = 0
+
 			for l in link.finditer(earlierText):
-				newlink = l.groups()[0]
+				bit = l.groups()[0]
+				if bit == "[[":
+					if linkcount == 0:
+						linkbegin = l.start()+2
+					linkcount +=1
+				elif bit == "]]":
+					linkcount -=1
+				else:
+					raise Exception, bit
+
+				if linkcount == 0:
+					newlink = earlierText[linkbegin:l.start()]
+				else:
+					continue
 				
 				if earlierText.find("#REDIRECT")!=-1:
 					print "saw redirect", newlink
