@@ -3,6 +3,12 @@ from sys import argv
 import re
 import codecs
 
+import locale
+import sys
+
+# Wrap sys.stdout into a StreamWriter to allow writing unicode.
+sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
+
 title = re.compile("<title>([^>]+)</title")
 text = re.compile("<text xml:space=\"preserve\">(.+)")
 link = re.compile("\[\[([^\]]+)\]\]")
