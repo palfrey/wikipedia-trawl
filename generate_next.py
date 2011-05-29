@@ -12,8 +12,15 @@ sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
 title = re.compile("<title>([^>]+)</title")
 text = re.compile("<text xml:space=\"preserve\">(.+)")
 link = re.compile("\[\[([^\]]+)\]\]")
-comments = re.compile("&lt;!--.+?--&gt;", re.MULTILINE|re.DOTALL)
 bracket = re.compile("((?:{{)|(?:}})|\(|\)|(?:(?<!')''(?!'))|\n)")
+
+removesets = [
+		["&lt;!--", "--&gt;"],
+		["&lt;ref&gt;", "&lt;/ref&gt;"]
+		]
+
+for r in removesets:
+	r.append(re.compile("%s.+?%s"%tuple(r), re.MULTILINE|re.DOTALL))
 
 con = sqlite3.connect("links.sqlite")
 con.text_factory = unicode
@@ -44,15 +51,23 @@ for line in dump:
 		
 		earlierText += line
 
-		if earlierText.find("&lt;!--")!=-1 and earlierText.find("--&gt;")==-1:
-			continue # find comment end
+		continueLoop = False
+		for (first, second, pattern) in removesets:
+			if earlierText.find(first)!=-1 and earlierText.find(second)==-1:
+				continueLoop = True
+				print "looking for", second
+				break # find remove bit end
 
-		while True:
-			comm = comments.search(earlierText)
-			if comm == None:
-				break
-			else:
-				earlierText = earlierText[:comm.start()] + earlierText[comm.end():]
+			while True:
+				comm = pattern.search(earlierText)
+				if comm == None:
+					break
+				else:
+					print "replaced", earlierText[comm.start():comm.end()]
+					earlierText = earlierText[:comm.start()] + earlierText[comm.end():]
+		
+		if continueLoop:
+			continue
 
 		for l in link.finditer(earlierText):
 			newlink = l.groups()[0]
