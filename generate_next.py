@@ -14,6 +14,8 @@ text = re.compile("<text xml:space=\"preserve\">(.+)")
 link = re.compile("\[\[([^\]]+)\]\]")
 bracket = re.compile("((?:{{)|(?:}})|\(|\)|(?:(?<!')''(?!'))|\n)")
 
+debug = False
+
 removesets = [
 		["&lt;!--", "--&gt;"],
 		["&lt;ref&gt;", "&lt;/ref&gt;"]
@@ -43,20 +45,24 @@ for line in dump:
 			poss = text.search(line)
 			if poss!=None:
 				intext = True
-				print "poss", poss.groups()
+				if debug:
+					print "poss", poss.groups()
 				line = poss.groups()[0]
 				earlierText = ""
 				brackets = []
 			else:
 				continue
 		
+		if debug:
+			print "line", line
 		earlierText += line
 
 		continueLoop = False
 		for (first, second, pattern) in removesets:
 			if earlierText.find(first)!=-1 and earlierText.find(second)==-1:
 				continueLoop = True
-				print "looking for", second
+				if debug:
+					print "looking for", second
 				break # find remove bit end
 
 			while True:
@@ -64,7 +70,8 @@ for line in dump:
 				if comm == None:
 					break
 				else:
-					print "replaced", earlierText[comm.start():comm.end()]
+					if debug:
+						print "replaced", earlierText[comm.start():comm.end()]
 					earlierText = earlierText[:comm.start()] + earlierText[comm.end():]
 		
 		if continueLoop:
@@ -98,6 +105,8 @@ for line in dump:
 				bra = match.groups()[0]
 				if bra in ("{{", "("):
 					brackets.append((bra, match.start()))
+					if debug:
+						print "open", earlierText[match.start()-10:match.end()+10], brackets
 				elif bra in ("}}", ")"):
 					# cope with mismatched brackets
 					if bra == "}}":
@@ -109,6 +118,8 @@ for line in dump:
 							brackets = brackets[:-1]
 					else:
 						raise Exception, earlierText
+					if debug:
+						print "close", earlierText[match.start()-10:match.end()+10], brackets
 				elif bra == "''":
 					if len(brackets)>0 and brackets[-1][0] == "''":
 						brackets = brackets[:-1]
@@ -119,9 +130,10 @@ for line in dump:
 						brackets = brackets[:-1]
 				else:
 					raise Exception, (bra, earlierText[:l.start()])
-			
+
 			if len(brackets) > 0:
-				print "bad match", brackets, earlierText
+				if debug:
+					print "bad match", brackets, earlierText
 				earlierText = earlierText[l.end():]
 				break
 			
