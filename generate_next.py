@@ -93,7 +93,7 @@ def generate_next(fname, existing):
 					continue
 				
 				if earlierText.find("#REDIRECT")!=-1:
-					print "saw redirect", newlink
+					print "saw redirect", current, newlink
 					redirects[current] = newlink
 					current = None
 					intext = False
@@ -168,9 +168,10 @@ def generate_next(fname, existing):
 					if newlink.find("UTC")==-1 and newlink.find(": ")==-1:
 						raise Exception, (current, newlink, earlierText[:l.end()])
 
-
 				if newlink in redirects:
-					raise Exception, (newlink, redirects[newlink])
+					if debug:
+						print "Redirecting %s to %s for %s"%(newlink, redirects[newlink], current)
+					newlink = redirects[newlink]
 
 				yield (current, newlink)
 				linkbegin = None
