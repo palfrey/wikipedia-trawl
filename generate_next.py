@@ -68,7 +68,7 @@ def generate_next(fname, existing):
 			if continueLoop:
 				continue
 
-			linkbegin = 0
+			linkbegin = None
 			linkcount = 0
 
 			for l in link.finditer(earlierText):
@@ -84,6 +84,7 @@ def generate_next(fname, existing):
 
 				if linkcount == 0:
 					newlink = earlierText[linkbegin:l.start()]
+					linkend = l.start()
 					if newlink.find("#")!=-1:
 						newlink = newlink[:newlink.find("#")]
 						if len(newlink) == 0:
@@ -125,13 +126,21 @@ def generate_next(fname, existing):
 								brackets = brackets[:-1]
 							brackets = brackets[:-1]
 						elif bra == ")":
-							# FIXME: Nasty hack to work around issues like the lack of a close in "Antoine Lavoisier"
+							# FIXME: While is a nasty hack to work around issues like the lack of a close in "Antoine Lavoisier"
 							while len(brackets)>0 and brackets[-1][0] == "(":
 								brackets = brackets[:-1]
+
+								# don't strip extra brackets from outside the link
+								if linkbegin < match.start() and linkend > match.end():
+									break
 						else:
 							raise Exception, earlierText
+						if linkbegin != None:
+							# strip all brackets during links
+							brackets = [b for b in brackets if b[1] <linkbegin or b[1]>linkend]
+
 						if debug:
-							print "close", earlierText[match.start()-10:match.end()+10], brackets
+							print "close", linkbegin, earlierText[match.start()-10:match.end()+10], brackets
 					elif bra == "''":
 						if len(brackets)>0 and brackets[-1][0] == "''":
 							brackets = brackets[:-1]
@@ -155,6 +164,7 @@ def generate_next(fname, existing):
 					raise Exception, (newlink, redirects[newlink])
 
 				yield (current, newlink)
+				linkbegin = None
 				current = None
 				intext = False
 				break

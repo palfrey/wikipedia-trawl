@@ -5,3 +5,4 @@ Acid,Base (chemistry),Acid.xml
 Art,senses,Art.xml
 Afonso de Albuquerque,Portugal,AfonsodeAlbuquerque.xml
 Antoine Lavoisier,Fathers of scientific fields,AntoineLavoisier.xml
+Almond,peach,Almond.xml
