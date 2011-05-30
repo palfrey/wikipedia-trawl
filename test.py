@@ -1,12 +1,13 @@
 from os import listdir
 from os.path import join
 from generate_next import generate_next
+import codecs
 
 test_dir = "test"
 
 tests = {}
 
-for line in open(join(test_dir, "list.txt")):
+for line in codecs.open(join(test_dir, "list.txt"), "rb", "utf-8"):
 	(name, to, fname) = line.strip().split(",")
 	tests[fname] = (name, to)
 
