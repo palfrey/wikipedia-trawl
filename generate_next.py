@@ -84,6 +84,10 @@ def generate_next(fname, existing):
 
 				if linkcount == 0:
 					newlink = earlierText[linkbegin:l.start()]
+					if newlink.find("#")!=-1:
+						newlink = newlink[:newlink.find("#")]
+						if len(newlink) == 0:
+							continue
 				else:
 					continue
 				
@@ -121,7 +125,8 @@ def generate_next(fname, existing):
 								brackets = brackets[:-1]
 							brackets = brackets[:-1]
 						elif bra == ")":
-							if len(brackets)>0 and brackets[-1][0] == "(":
+							# FIXME: Nasty hack to work around issues like the lack of a close in "Antoine Lavoisier"
+							while len(brackets)>0 and brackets[-1][0] == "(":
 								brackets = brackets[:-1]
 						else:
 							raise Exception, earlierText
@@ -140,7 +145,7 @@ def generate_next(fname, existing):
 
 				if len(brackets) > 0:
 					if debug:
-						print "bad match", brackets, earlierText
+						print "bad match", brackets, newlink, "text", earlierText
 					earlierText = earlierText[l.end():]
 					break
 				
@@ -149,16 +154,13 @@ def generate_next(fname, existing):
 				if newlink in redirects:
 					raise Exception, (newlink, redirects[newlink])
 
-				if newlink[0] == "#":
-					continue
-
 				yield (current, newlink)
 				current = None
 				intext = False
 				break
 
 			if intext and earlierText.find("</text>")!=-1:
-				raise Exception, earlierText
+				raise Exception, current
 
 		poss = title.search(line)
 		if poss!=None:
