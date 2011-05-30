@@ -108,7 +108,7 @@ def generate_next(fname, existing):
 					namespace = newlink.split(":")[0].lower()
 					if namespace.find(" ")!=-1:
 						continue
-					if namespace in ("file", "image", "template", "wikipedia", "wikt", "category", "wp", "wikinvest"):
+					if namespace in ("file", "image", "template", "wikipedia", "wikt", "category", "wp", "wikinvest", "wiktionary"):
 						continue
 					if newlink.find("UTC")==-1:
 						raise Exception, (current, newlink, earlierText[:l.end()])

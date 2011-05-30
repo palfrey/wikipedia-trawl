@@ -8,3 +8,4 @@ Antoine Lavoisier,Fathers of scientific fields,AntoineLavoisier.xml
 Almond,peach,Almond.xml
 Abadeh,Fars Province,Abadeh.xml
 Abated,masonry,Abated.xml
+Abd-ar-Rahman III,Emir of Córdoba,Abd-ar-Rahman III.xml
