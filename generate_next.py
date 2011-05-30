@@ -24,6 +24,24 @@ for r in removesets:
 
 redirects = {}
 
+def namespace_check(newlink):
+	if newlink.find(":")!=-1:
+		if newlink[0] == ":":
+			newlink = newlink[1:]
+		namespace = newlink.split(":")[0].lower()
+		if namespace.find(" ")!=-1:
+			return False
+		if namespace in ("file", "image", "template", "wikipedia", "wikt", "category", "wp", "wikinvest", "wiktionary", "portal"):
+			return False
+		if len(namespace) == 2 or namespace.find("zh-")==0:
+			if debug:
+				print "language namespace link", newlink
+			return False # assume language link
+		if newlink.find("UTC")==-1 and newlink.find(": ")==-1:
+			raise Exception, (namespace, newlink)
+		return False
+	return True
+
 def generate_next(fname, existing):
 	current = None
 	intext = False
@@ -155,20 +173,8 @@ def generate_next(fname, existing):
 				
 				brackets = []
 
-				if newlink.find(":")!=-1:
-					if newlink[0] == ":":
-						newlink = newlink[1:]
-					namespace = newlink.split(":")[0].lower()
-					if namespace.find(" ")!=-1:
-						continue
-					if namespace in ("file", "image", "template", "wikipedia", "wikt", "category", "wp", "wikinvest", "wiktionary"):
-						continue
-					if len(namespace) == 2 or namespace.find("zh-")==0:
-						if debug:
-							print "language namespace link", newlink, current
-						continue # assume language link
-					if newlink.find("UTC")==-1 and newlink.find(": ")==-1:
-						raise Exception, (current, newlink, earlierText[:l.end()])
+				if not namespace_check(newlink):
+					continue
 
 				if newlink in redirects:
 					if debug:
@@ -194,8 +200,8 @@ def generate_next(fname, existing):
 			if existing(current):
 				print "already have", current
 				current = None
-			elif current.find("Wikipedia:")!=-1:
-				print "wikipedia internal link", current
+			elif not namespace_check(current):
+				print "namespaced link", current
 				current = None
 			else:
 				if debug:
