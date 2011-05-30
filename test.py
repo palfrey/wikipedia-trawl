@@ -1,7 +1,9 @@
 from os import listdir
 from os.path import join
-from generate_next import generate_next
+import generate_next
 import codecs
+
+generate_next.debug = True
 
 test_dir = "test"
 
@@ -14,7 +16,7 @@ for line in codecs.open(join(test_dir, "list.txt"), "rb", "utf-8"):
 for fname in listdir(test_dir):
 	if fname.find(".xml")!=-1:
 		found = False
-		for (name, to) in generate_next(join(test_dir, fname), lambda x:False):
+		for (name, to) in generate_next.generate_next(join(test_dir, fname), lambda x:False):
 			assert not found
 			assert fname in tests, ("%s,%s,%s"%(name, to, fname))
 			assert tests[fname] == (name, to), (tests[fname], (name, to))
