@@ -186,6 +186,9 @@ def generate_next(fname, existing):
 			if existing(current):
 				print "already have", current
 				current = None
+			elif current.find("Wikipedia:")!=-1:
+				print "wikipedia internal link", current
+				current = None
 			else:
 				if debug:
 					print "title", current
