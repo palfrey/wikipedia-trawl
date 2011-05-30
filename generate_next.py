@@ -46,7 +46,7 @@ def generate_next(fname, existing):
 			
 			if debug:
 				print "line", line
-			earlierText += line
+			earlierText += "\n" + line
 
 			continueLoop = False
 			for (first, second, pattern) in removesets:
@@ -143,6 +143,8 @@ def generate_next(fname, existing):
 						if debug:
 							print "close", linkbegin, earlierText[match.start()-10:match.end()+10], brackets
 					elif bra == "''":
+						if debug:
+							print "saw a ''", brackets, match.start(), earlierText[match.start()-10:match.end()+10]
 						if len(brackets)>0 and brackets[-1][0] == "''":
 							brackets = brackets[:-1]
 						else:
