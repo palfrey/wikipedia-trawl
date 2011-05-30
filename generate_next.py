@@ -102,18 +102,6 @@ def generate_next(fname, existing):
 				if newlink.find("|")!=-1:
 					newlink = newlink.split("|")[0]
 
-				if newlink.find(":")!=-1:
-					if newlink[0] == ":":
-						newlink = newlink[1:]
-					namespace = newlink.split(":")[0].lower()
-					if namespace.find(" ")!=-1:
-						continue
-					if namespace in ("file", "image", "template", "wikipedia", "wikt", "category", "wp", "wikinvest", "wiktionary"):
-						continue
-					if newlink.find("UTC")==-1 and newlink.find(": ")==-1:
-						raise Exception, (current, newlink, earlierText[:l.end()])
-				#print "earlier", earlierText
-
 				for match in bracket.finditer(earlierText[:l.start()]):
 					bra = match.groups()[0]
 					if bra in ("{{", "("):
@@ -166,6 +154,19 @@ def generate_next(fname, existing):
 					break
 				
 				brackets = []
+
+				if newlink.find(":")!=-1:
+					if newlink[0] == ":":
+						newlink = newlink[1:]
+					namespace = newlink.split(":")[0].lower()
+					if namespace.find(" ")!=-1:
+						continue
+					if namespace in ("file", "image", "template", "wikipedia", "wikt", "category", "wp", "wikinvest", "wiktionary"):
+						continue
+					if newlink.find("UTC")==-1 and newlink.find(": ")==-1:
+						raise Exception, (current, newlink, earlierText[:l.end()])
+
+
 
 				if newlink in redirects:
 					raise Exception, (newlink, redirects[newlink])
