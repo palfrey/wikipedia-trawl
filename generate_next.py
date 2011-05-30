@@ -110,7 +110,8 @@ def generate_next(fname, existing):
 						continue
 					if namespace in ("file", "image", "template", "wikipedia", "wikt", "category", "wp", "wikinvest"):
 						continue
-					raise Exception, (newlink, earlierText[:l.end()])
+					if newlink.find("UTC")==-1:
+						raise Exception, (current, newlink, earlierText[:l.end()])
 				#print "earlier", earlierText
 
 				for match in bracket.finditer(earlierText[:l.start()]):
