@@ -169,7 +169,6 @@ def generate_next(fname, existing):
 						raise Exception, (current, newlink, earlierText[:l.end()])
 
 
-
 				if newlink in redirects:
 					raise Exception, (newlink, redirects[newlink])
 
@@ -181,7 +180,9 @@ def generate_next(fname, existing):
 
 			if intext and earlierText.find("</text>")!=-1:
 				yield (current, None)
-				break
+				linkbegin = None
+				current = None
+				intext = False
 
 		poss = title.search(line)
 		if poss!=None:
