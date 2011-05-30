@@ -178,7 +178,8 @@ def generate_next(fname, existing):
 				break
 
 			if intext and earlierText.find("</text>")!=-1:
-				raise Exception, current
+				yield (current, None)
+				break
 
 		poss = title.search(line)
 		if poss!=None:
