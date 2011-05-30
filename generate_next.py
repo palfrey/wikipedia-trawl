@@ -163,7 +163,7 @@ def generate_next(fname, existing):
 						continue
 					if namespace in ("file", "image", "template", "wikipedia", "wikt", "category", "wp", "wikinvest", "wiktionary"):
 						continue
-					if len(namespace) == 2:
+					if len(namespace) == 2 or namespace.find("zh-")==0:
 						continue # assume language link
 					if newlink.find("UTC")==-1 and newlink.find(": ")==-1:
 						raise Exception, (current, newlink, earlierText[:l.end()])
