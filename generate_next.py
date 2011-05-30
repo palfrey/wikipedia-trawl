@@ -24,6 +24,8 @@ for r in removesets:
 
 redirects = {}
 
+languages = ("ace", "af", "als", "an", "roa-rup", "ast", "gn", "av", "ay", "az", "id", "ms", "bm", "zh-min-nan", "jv", "map-bms", "su", "bug", "bi", "bar", "bs", "br", "ca", "cbk-zam", "ch", "cs", "ny", "sn", "tum", "ve", "co", "za", "cy", "da", "pdc", "de", "nv", "na", "lad", "et", "ang", "en", "es", "eo", "ext", "eu", "to", "fo", "fr", "frp", "fy", "ff", "fur", "ga", "gv", "sm", "gd", "gl", "got", "hak", "haw", "hsb", "hr", "io", "ilo", "ig", "ia", "ie", "ik", "xh", "zu", "is", "it", "mh", "kl", "pam", "csb", "kw", "kg", "ki", "rw", "ky", "rn", "sw", "ht", "ku", "la", "lv", "lb", "lt", "lij", "li", "ln", "jbo", "lg", "lmo", "hu", "mg", "mt", "mi", "cdo", "my", "nah", "fj", "nl", "cr", "ne", "nap", "frr", "pih", "no", "nn", "nrm", "oc", "om", "pag", "pi", "pap", "pms", "nds", "pl", "pt", "ty", "ksh", "ro", "rmy", "rm", "qu", "se", "sg", "sc", "sco", "st", "tn", "sq", "scn", "simple", "ceb", "ss", "sk", "sl", "so", "sh", "fi", "sv", "tl", "tt", "tet", "vi", "tpi", "chy", "tr", "tk", "tw", "vec", "vo", "fiu-vro", "wa", "vls", "war", "wo", "ts", "yo", "bat-smg", "el", "ab", "ba", "be", "be-x-old", "bg", "bxr", "cu", "os", "kk", "kv", "mk", "mn", "ce", "ru", "sr", "tg", "udm", "uk", "uz", "xal", "cv", "hy", "ka", "RTL", "he", "yi", "RTL", "ar", "fa", "ha", "ps", "sd", "ur", "ug", "arc", "dv", "as", "bn", "bpy", "gu", "bh", "hi", "ks", "mr", "kn", "ne", "new", "sa", "ml", "or", "pa", "ta", "te", "bo", "dz", "si", "km", "lo", "th", "am", "ti", "iu", "chr", "ko", "ja", "zh", "wuu", "lzh", "yue", "gan", "sah", "zh-yue")
+
 def namespace_check(newlink):
 	if newlink.find(":")!=-1:
 		if newlink[0] == ":":
@@ -33,9 +35,7 @@ def namespace_check(newlink):
 			return False
 		if namespace in ("file", "image", "template", "wikipedia", "wikt", "category", "wp", "wikinvest", "wiktionary", "portal"):
 			return False
-		if len(namespace) == 2 or namespace.find("zh-")==0:
-			if debug:
-				print "language namespace link", newlink
+		if namespace in languages:
 			return False # assume language link
 		if newlink.find("UTC")==-1 and newlink.find(": ")==-1:
 			raise Exception, (namespace, newlink)
