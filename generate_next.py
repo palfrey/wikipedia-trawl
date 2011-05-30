@@ -138,7 +138,11 @@ def generate_next(fname, existing):
 							raise Exception, earlierText
 						if linkbegin != None:
 							# strip all brackets during links
-							brackets = [b for b in brackets if b[1] <linkbegin or b[1]>linkend]
+							old = brackets
+							brackets = [b for b in brackets if b[0] != "(" or b[1] <linkbegin or b[1]>linkend]
+							if old!=brackets:
+								print "before", old
+								print "after", brackets
 
 						if debug:
 							print "close", linkbegin, earlierText[match.start()-10:match.end()+10], brackets
