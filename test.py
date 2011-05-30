@@ -16,7 +16,7 @@ for fname in listdir(test_dir):
 		found = False
 		for (name, to) in generate_next(join(test_dir, fname), lambda x:False):
 			assert not found
-			assert fname in tests, (fname, (name, to))
+			assert fname in tests, ("%s,%s,%s"%(name, to, fname))
 			assert tests[fname] == (name, to), (tests[fname], (name, to))
 			found = True
 		assert found, fname
