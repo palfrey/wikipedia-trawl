@@ -232,8 +232,12 @@ if __name__ == "__main__":
 	if len(cur.fetchall())==0:
 		cur.execute("create table links (name text primary key, next text, loopCount int, waysHere int)")
 
+	count = 0
+
 	for (name, to) in generate_next(argv[1], sqlite_existing):
 		print "new", name, to
 		cur.execute("insert into links values (?, ?, 0, 1)",(name, to))
-		con.commit()
+		count += 1
+		if count % 50 == 0:
+			con.commit()
 
