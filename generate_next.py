@@ -29,18 +29,17 @@ languages = ("aa", "ab", "ace", "af", "ak", "als", "am", "an", "ang", "ar", "arc
 
 def namespace_check(newlink):
 	if newlink.find(":")!=-1:
-		if newlink[0] == ":":
-			newlink = newlink[1:]
+		if newlink.find("::")!=-1:
+			return True
 		namespace = newlink.split(":")[0].lower()
 		if namespace.find(" ")!=-1:
 			return False
-		if namespace in ("file", "image", "template", "wikipedia", "wikt", "category", "wp", "wikinvest", "wiktionary", "portal"):
+		if namespace in ("file", "image", "template", "wikipedia", "wikt", "category", "wp", "wikinvest", "wiktionary", "portal", "help", "media", "talk", "mediawiki"):
+			return False
+		if namespace == "s": # wikisource
 			return False
 		if namespace in languages:
 			return False # assume language link
-		if newlink.find("UTC")==-1 and newlink.find(": ")==-1:
-			raise Exception, (namespace, newlink)
-		return False
 	return True
 
 def generate_next(fname, existing):
