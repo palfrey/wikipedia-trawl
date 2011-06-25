@@ -113,6 +113,10 @@ def generate_next(fname, existing):
 				if earlierText.find("#REDIRECT")!=-1:
 					print "saw redirect", current, newlink
 					redirects[current] = newlink
+					if not existing(current, True):
+						yield (current, newlink, True)
+					else:
+						raise Exception
 					current = None
 					intext = False
 					break
@@ -173,22 +177,27 @@ def generate_next(fname, existing):
 				
 				brackets = []
 
-				if not namespace_check(newlink):
-					continue
+				try:
+					if not namespace_check(newlink):
+						continue
+				except:
+					print "current"
+					raise
 
 				if newlink in redirects:
 					if debug:
 						print "Redirecting %s to %s for %s"%(newlink, redirects[newlink], current)
 					newlink = redirects[newlink]
 
-				yield (current, newlink)
+				yield (current, newlink, False)
 				linkbegin = None
 				current = None
 				intext = False
 				break
 
 			if intext and earlierText.find("</text>")!=-1:
-				yield (current, None)
+				print "no link", current
+				yield (current, None, False)
 				linkbegin = None
 				current = None
 				intext = False
@@ -197,7 +206,7 @@ def generate_next(fname, existing):
 		if poss!=None:
 			assert current == None
 			current = poss.groups()[0]
-			if existing(current):
+			if existing(current, False):
 				print "already have", current
 				current = None
 			elif not namespace_check(current):
@@ -209,8 +218,11 @@ def generate_next(fname, existing):
 		else:
 			continue
 
-def sqlite_existing(title):
-	cur.execute("select name from links where name=?", (title,))
+def sqlite_existing(title, redirect):
+	if redirect:
+		cur.execute("select name from redirects where name=?", (title,))
+	else:
+		cur.execute("select name from links where name=?", (title,))
 	f = cur.fetchall()
 	return len(f)==1
 
@@ -220,12 +232,23 @@ if __name__ == "__main__":
 	con = sqlite3.connect("links.sqlite")
 	con.text_factory = unicode
 	cur = con.cursor()
+
 	cur.execute("select name from sqlite_master where type='table' and name='links'")
 	if len(cur.fetchall())==0:
 		cur.execute("create table links (name text primary key, next text, loopCount int, waysHere int)")
 
-	for (name, to) in generate_next(argv[1], sqlite_existing):
-		print "new", name, to
-		cur.execute("insert into links values (?, ?, 0, 1)",(name, to))
-		con.commit()
+	cur.execute("select name from sqlite_master where type='table' and name='redirects'")
+	if len(cur.fetchall())==0:
+		cur.execute("create table redirects (name text primary key, next text)")
+
+	for (name, to, redirect) in generate_next(argv[1], sqlite_existing):
+		if redirect:
+			print "redirect", name, to
+			cur.execute("insert into redirects values (?, ?)",(name, to))
+			con.commit()
+		else:
+			print "new", name, to
+			cur.execute("insert into links values (?, ?, 0, 1)",(name, to))
+			con.commit()
+
 
