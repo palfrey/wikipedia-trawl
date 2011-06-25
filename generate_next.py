@@ -105,8 +105,8 @@ def generate_next(fname, existing):
 					linkend = l.start()
 					if newlink.find("#")!=-1:
 						newlink = newlink[:newlink.find("#")]
-						if len(newlink) == 0:
-							continue
+					if len(newlink) == 0:
+						continue
 				else:
 					continue
 				
@@ -119,6 +119,8 @@ def generate_next(fname, existing):
 
 				if newlink.find("|")!=-1:
 					newlink = newlink.split("|")[0]
+					if len(newlink) == 0:
+						continue
 
 				for match in bracket.finditer(earlierText[:l.start()]):
 					bra = match.groups()[0]
@@ -173,8 +175,14 @@ def generate_next(fname, existing):
 				
 				brackets = []
 
-				if not namespace_check(newlink):
-					continue
+				try:
+					if newlink[0] == ":":
+						newlink = newlink[1:]
+					if not namespace_check(newlink):
+						continue
+				except:
+					print "current", current
+					raise
 
 				if newlink in redirects:
 					if debug:
