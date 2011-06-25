@@ -16,7 +16,8 @@ debug = False
 
 removesets = [
 		["&lt;!--", "--&gt;"],
-		["&lt;ref&gt;", "&lt;/ref&gt;"]
+		["&lt;ref&gt;", "&lt;/ref&gt;"],
+		["&lt;imagemap&gt;", "&lt;/imagemap&gt;"]
 		]
 
 for r in removesets:
