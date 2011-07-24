@@ -36,6 +36,9 @@ def get_next_link(page):
 			elif parent.tag in ["i", "table"]:
 				invalid = True
 				break
+			elif parent.tag in ["span"] and parent.attrib["id"] in ["coordinates"]:
+				invalid = True
+				break
 			parent = parent.getparent()
 
 		text = "href=\"%s\""%href
