@@ -4,6 +4,8 @@ import codecs
 import locale
 import sys
 
+from direct import get_next_link
+
 # Wrap sys.stdout into a StreamWriter to allow writing unicode.
 sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
 
@@ -11,6 +13,7 @@ title = re.compile("<title>([^>]+)</title")
 text = re.compile("<text xml:space=\"preserve\">(.+)")
 bracket = re.compile("((?:{{)|(?:}})|\(|\)|(?:(?<!')''(?!'))|\n)")
 link = re.compile("((?:\[\[)|(?:\]\]))")
+templateEndName = re.compile("(\||\n|(?:}}))")
 
 debug = False
 
@@ -28,7 +31,7 @@ redirects = {}
 languages = ("aa", "ab", "ace", "af", "ak", "als", "am", "an", "ang", "ar", "arc", "arz", "as", "ast", "av", "ay", "az", "ba", "bar", "bat-smg", "bcl", "be", "be-x-old", "bg", "bh", "bi", "bjn", "bm", "bn", "bo", "bpy", "br", "bs", "bug", "bxr", "ca", "cbk-zam", "cdo", "ce", "ceb", "ch", "cho", "chr", "chy", "ckb", "co", "cr", "crh", "cs", "csb", "cu", "cv", "cy", "cz", "da", "de", "diq", "dk", "dsb", "dv", "dz", "ee", "el", "eml", "en", "eo", "epo", "es", "et", "eu", "ext", "fa", "ff", "fi", "fiu-vro", "fj", "fo", "fr", "frp", "frr", "fur", "fy", "ga", "gag", "gan", "gd", "gl", "glk", "gn", "got", "gu", "gv", "ha", "hak", "haw", "he", "hi", "hif", "ho", "hr", "hsb", "ht", "hu", "hy", "hz", "ia", "id", "ie", "ig", "ii", "ik", "ilo", "io", "is", "it", "iu", "ja", "jbo", "jp", "jv", "ka", "kaa", "kab", "kbd", "kg", "ki", "kj", "kk", "kl", "km", "kn", "ko", "koi", "kr", "krc", "ks", "ksh", "ku", "kv", "kw", "ky", "la", "lad", "lb", "lbe", "lg", "li", "lij", "lmo", "ln", "lo", "lt", "ltg", "lv", "map-bms", "mdf", "mg", "mh", "mhr", "mi", "minnan", "mk", "ml", "mn", "mo", "mr", "mrj", "ms", "mt", "mus", "mwl", "my", "myv", "mzn", "na", "nah", "nan", "nap", "nb", "nds", "nds-nl", "ne", "new", "ng", "nl", "nn", "no", "nov", "nrm", "nv", "ny", "oc", "om", "or", "os", "pa", "pag", "pam", "pap", "pcd", "pdc", "pfl", "pi", "pih", "pl", "pms", "pnb", "pnt", "ps", "pt", "qu", "rm", "rmy", "rn", "ro", "roa-rup", "roa-tara", "ru", "rue", "rw", "sa", "sah", "sc", "scn", "sco", "sd", "se", "sg", "sh", "si", "simple", "sk", "sl", "sm", "sn", "so", "sq", "sr", "srn", "ss", "st", "stq", "su", "sv", "sw", "szl", "ta", "te", "tet", "tg", "th", "ti", "tk", "tl", "tn", "to", "tpi", "tr", "ts", "tt", "tum", "tw", "ty", "udm", "ug", "uk", "ur", "uz", "ve", "vec", "vi", "vls", "vo", "wa", "war", "wo", "wuu", "xal", "xh", "yi", "yo", "za", "zea", "zh", "zh-cfr", "zh-classical", "zh-min-nan", "zh-yue", "zu")
 
 def namespace_check(newlink):
-	if newlink.find(":")!=-1:
+	if newlink!=None and newlink.find(":")!=-1:
 		if newlink.find("::")!=-1:
 			return True
 		namespace = newlink.split(":")[0].lower()
@@ -128,7 +131,41 @@ def generate_next(fname, existing):
 
 				for match in bracket.finditer(earlierText[:l.start()]):
 					bra = match.groups()[0]
-					if bra in ("{{", "("):
+					if bra in ("{{"):
+						remaining = earlierText[match.end():]
+						end = templateEndName.search(remaining)
+						assert end!=None, remaining
+						template = remaining[:end.start()].strip().lower()
+
+						special = False
+						
+						while True:
+							if len(brackets)>0: # nested template
+								break
+							if template.find("infobox")==0: # infoboxes aren't main text
+								break
+							if template.find("pp-") == 0:
+								break
+							if template.find("taxobox")!=-1:
+								break
+							if template in ["about", "redirect", "dablink", "other uses", "nutritional value", "geobox", "refimprove", "spoken wikipedia", "other people2", "two other uses", "speciesbox", "acids and bases", "decadebox", "for", "coord", "cleanup-rewrite"]:
+								break # safe templates
+							
+							if template in ["wiktionary redirect", "events by year for decade"] or template.find("lang-")==0:
+								newlink = get_next_link(current)
+								brackets = []
+								special = True
+								break
+
+							raise Exception, (template, brackets)
+
+						if special:
+							break
+
+						brackets.append((bra, match.start()))
+						if debug:
+							print "open", earlierText[match.start()-10:match.end()+10], brackets
+					elif bra in ("("):
 						brackets.append((bra, match.start()))
 						if debug:
 							print "open", earlierText[match.start()-10:match.end()+10], brackets
@@ -176,11 +213,11 @@ def generate_next(fname, existing):
 						print "bad match", brackets, newlink, "text", earlierText
 					earlierText = earlierText[l.end():]
 					break
-				
+
 				brackets = []
 
 				try:
-					if newlink[0] == ":":
+					if newlink!=None and newlink[0] == ":":
 						newlink = newlink[1:]
 					if not namespace_check(newlink):
 						continue
