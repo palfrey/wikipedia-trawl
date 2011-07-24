@@ -44,13 +44,15 @@ def get_next_link(page):
 		text = "href=\"%s\""%href
 		location = context.find(text)
 		assert location!=-1, (text, context)
+		count = 0
 		for i in range(location, 0, -1):
 			if context[i] == ")":
-				break
+				count -=1
 			elif context[i] == "(":
-				#print "bracket", context[i:location]
-				invalid = True
-				break
+				count +=1
+
+		if count != 0:
+			invalid = True
 		
 		if invalid:
 			#print "invalid", link.attrib
