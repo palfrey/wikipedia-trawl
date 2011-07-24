@@ -58,27 +58,28 @@ def get_next_link(page):
 		return href[len("/wiki/"):]
 	raise Exception
 
-link = argv[1]
-links = [link]
+if __name__ == "__main__":
+	link = argv[1]
+	links = [link]
 
-con = sqlite3.connect("links.sqlite")
-cur = con.cursor()
-cur.execute("select name from sqlite_master where type='table' and name='links'")
-if len(cur.fetchall())==0:
-	cur.execute("create table links (name text primary key, next text, loopCount int, waysHere int)")
+	con = sqlite3.connect("links.sqlite")
+	cur = con.cursor()
+	cur.execute("select name from sqlite_master where type='table' and name='links'")
+	if len(cur.fetchall())==0:
+		cur.execute("create table links (name text primary key, next text, loopCount int, waysHere int)")
 
-while True:
-	print link
-	cur.execute("select next from links where name='%s'"%link)
-	f = cur.fetchall()
-	if len(f)!=1:
-		newlink = get_next_link(link)
-		cur.execute("insert into links values (?, ?, 0, 1)",(link, newlink))
-		con.commit()
-	else:
-		newlink = f[0][0]
-	link = newlink
-	if link in links:
-		print "loop", link
-		break
-	links.append(link)
+	while True:
+		print link
+		cur.execute("select next from links where name='%s'"%link)
+		f = cur.fetchall()
+		if len(f)!=1:
+			newlink = get_next_link(link)
+			cur.execute("insert into links values (?, ?, 0, 1)",(link, newlink))
+			con.commit()
+		else:
+			newlink = f[0][0]
+		link = newlink
+		if link in links:
+			print "loop", link
+			break
+		links.append(link)
