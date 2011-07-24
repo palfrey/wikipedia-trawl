@@ -61,7 +61,7 @@ def get_next_link(page):
 		#print etree.tostring(link.getparent())
 		assert href.find("/wiki/")==0, href
 		return href[len("/wiki/"):]
-	raise Exception
+	return None
 
 if __name__ == "__main__":
 	link = argv[1]
