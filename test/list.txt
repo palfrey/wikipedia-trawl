@@ -18,3 +18,4 @@ Asia Minor,Anatolia,Asia Minor.xml
 Ephesus,Anatolia,Ephesus.xml
 Intellect,human,Intellect.xml
 Human,Extant taxon,Human.xml
+1490s,1490,1490s.xml
